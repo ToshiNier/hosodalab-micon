@@ -1,1 +1,1 @@
-# hosodalab-dynamixel_lib
+# hosodalab-dynamixel_libdj_kintore
