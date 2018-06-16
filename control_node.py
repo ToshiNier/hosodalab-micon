@@ -14,38 +14,38 @@ from getch import Getch
 
 PROTOCOL_VERSION = 2.0
 
-DXL_ID_RIGHT = 1
-DXL_ID_LEFT = 2
+DXL_ID_MAIN = 1
+DXL_ID_TAIL = 2
 BAUDRATE = 57600
 DEVICENAME = '/dev/ttyUSB0'
 
 def main():
     print "start node."
-    rospy.init_node("servomotor_controller")
+    rospy.init_node("servomotor_writer")
 
     timer = rospy.Rate(0.5)
 
 
 
 
-    left_motor_controller = DynamixelServomotorController(device_name = DEVICENAME, protocol_version = PROTOCOL_VERSION,\
+    main_motor_controller = DynamixelServomotorController(device_name = DEVICENAME, protocol_version = PROTOCOL_VERSION,\
                     baudrate = BAUDRATE, motor_config = XLConfig())
-    left_motor_controller.current_id = DXL_ID_LEFT
+    main_motor_controller.current_id = DXL_ID_MAIN
 
-    right_motor_controller = DynamixelServomotorController(device_name = DEVICENAME, protocol_version = PROTOCOL_VERSION,\
+    tail_motor_controller = DynamixelServomotorController(device_name = DEVICENAME, protocol_version = PROTOCOL_VERSION,\
                     baudrate = BAUDRATE, motor_config = XLConfig())
-    right_motor_controller.current_id = DXL_ID_RIGHT
+    tail_motor_controller.current_id = DXL_ID_TAIL
 
 
-    #motor_controller.set_operating_mode(XLConfig.OPERATING_MODE_POSITION_CONTROL_MODE)
-    motor_controller.set_operating_mode(XLConfig.OPERATING_MODE_VELOCITY_CONTROL_MODE)
+    main_motor_controller.set_operating_mode(XLConfig.OPERATING_MODE_POSITION_CONTROL_MODE)
+    tail_motor_controller.set_operating_mode(XLConfig.OPERATING_MODE_VELOCITY_CONTROL_MODE)
 
     print "torque_enable: "
-    motor_controller.set_torque_enable(1)
-
-    print "id: " + str(motor_controller.id())
-    print "baudrate: " + str(motor_controller.baudrate())
-    print "torque_enable: " + str(motor_controller.torque_enable())
+    main_motor_controller.set_torque_enable(1)
+    tail_motor_controller.set_torque_enable(1) 
+    #print "id: " + str(motor_controller.id())
+    #print "baudrate: " + str(motor_controller.baudrate())
+    #print "torque_enable: " + str(motor_controller.torque_enable())
 
 
 
