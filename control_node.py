@@ -5,6 +5,8 @@
 import rospy
 
 from dynamixel_servomotor_controller import *
+from micon.msg import Dynamixelcontrol 
+from micon.srv	import Dynamixelcontrolarray,DynamixelcontrolarrayResponse
 from xl_config import *
 from getch import Getch
 
@@ -19,6 +21,12 @@ DXL_ID_TAIL = 2
 BAUDRATE = 57600
 DEVICENAME = '/dev/ttyUSB0'
 
+#The callback function for the service
+def overwrite(request):
+
+	if request.:
+		pass
+
 def main():
     print "start node."
     rospy.init_node("servomotor_writer")
@@ -26,8 +34,8 @@ def main():
     timer = rospy.Rate(0.5)
 
 
-
-
+   
+    #Now initialising the motors 
     main_motor_controller = DynamixelServomotorController(device_name = DEVICENAME, protocol_version = PROTOCOL_VERSION,\
                     baudrate = BAUDRATE, motor_config = XLConfig())
     main_motor_controller.current_id = DXL_ID_MAIN
@@ -40,9 +48,12 @@ def main():
     main_motor_controller.set_operating_mode(XLConfig.OPERATING_MODE_POSITION_CONTROL_MODE)
     tail_motor_controller.set_operating_mode(XLConfig.OPERATING_MODE_VELOCITY_CONTROL_MODE)
 
+    #Enabling torque
     print "torque_enable: "
     main_motor_controller.set_torque_enable(1)
     tail_motor_controller.set_torque_enable(1) 
+
+
     #print "id: " + str(motor_controller.id())
     #print "baudrate: " + str(motor_controller.baudrate())
     #print "torque_enable: " + str(motor_controller.torque_enable())
