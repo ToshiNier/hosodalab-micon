@@ -7,7 +7,8 @@ import rospy
 from dynamixel_servomotor_controller import *
 from xl_config import *
 from getch import Getch
-
+from micon.msg import Dynamixelcontrol 
+from micon.srv import Dynamixelcontrolarray,DynamixelcontrolarrayResponse
 
 #from time import sleep
 
