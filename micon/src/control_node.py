@@ -75,64 +75,37 @@ def overwrite(request):
                 	tail_motor_controller.set_goal_velocity(0.0)
 
 
-def main():
-    print "start node."
-    rospy.init_node("servomotor_writer")
-    service = rospy.Service('servo_rewrite', Dynamixelcontrolarray, overwrite)
-
-    timer = rospy.Rate(0.5)
+print "start node."
+rospy.init_node("servomotor_writer")
 
 
-   
-    #Now initialising the motors 
-    body_motor_controller = DynamixelServomotorController(device_name = DEVICENAME, protocol_version = PROTOCOL_VERSION,\
-                    baudrate = BAUDRATE, motor_config = XLConfig())
-    body_motor_controller.current_id = DXL_ID_BODY
-
-    tail_motor_controller = DynamixelServomotorController(device_name = DEVICENAME, protocol_version = PROTOCOL_VERSION,\
-                    baudrate = BAUDRATE, motor_config = XLConfig())
-    tail_motor_controller.current_id = DXL_ID_TAIL
+timer = rospy.Rate(0.5)
 
 
-    #body_motor_controller.set_operating_mode(XLConfig.OPERATING_MODE_POSITION_CONTROL_MODE)
-    #tail_motor_controller.set_operating_mode(XLConfig.OPERATING_MODE_VELOCITY_CONTROL_MODE)
 
-    #Enabling torque
-    print "torque_enable: "
-    body_motor_controller.set_torque_enable(1)
-    tail_motor_controller.set_torque_enable(1) 
+#Now initialising the motors 
+body_motor_controller = DynamixelServomotorController(device_name = DEVICENAME, protocol_version = PROTOCOL_VERSION,\
+                baudrate = BAUDRATE, motor_config = XLConfig())
+body_motor_controller.current_id = DXL_ID_BODY
 
+tail_motor_controller = DynamixelServomotorController(device_name = DEVICENAME, protocol_version = PROTOCOL_VERSION,\
+                baudrate = BAUDRATE, motor_config = XLConfig())
+tail_motor_controller.current_id = DXL_ID_TAIL
 
-    while not rospy.is_shutdown():
+print "torque_enable: "
+body_motor_controller.set_torque_enable(1)
+tail_motor_controller.set_torque_enable(1) 
 
-        try:
-            speed = float(cmd)
-            print "speed: " + str(speed)
-            # motor_controller.set_goal_velocity(speed)
-        except:
-            isAccepted = False
-
-        print "OK"
-
-        # print "loop"
-
-        # motor_controller.set_goal_velocity(speed)
-        # print "max_position: " +  str(motor_controller.max_position_limit())
-        # print "min_position: " +  str(motor_controller.min_position_limit())
-
-        # speed += dir
-        # if speed > max_speed:
-        #     speed = max_speed
-        #     dir *= -1
-
-        # if speed < -max_speed:
-        #     speed = -max_speed
-        #     dir *= -1
-
-        # print str(speed)
-
-        timer.sleep()
+service = rospy.Service('servo_rewrite', Dynamixelcontrolarray, overwrite)
 
 
-if __name__ == "__main__":
-    main()
+#body_motor_controller.set_operating_mode(XLConfig.OPERATING_MODE_POSITION_CONTROL_MODE)
+#tail_motor_controller.set_operating_mode(XLConfig.OPERATING_MODE_VELOCITY_CONTROL_MODE)
+
+#Enabling torque
+
+
+
+# while not rospy.is_shutdown():
+
+rospy.spin()
