@@ -16,8 +16,8 @@ from getch import Getch
 
 PROTOCOL_VERSION = 2.0
 
-DXL_ID_BODY = 1
-DXL_ID_TAIL = 2
+DXL_ID_BODY = 2
+DXL_ID_TAIL = 1
 BAUDRATE = 57600
 DEVICENAME = '/dev/ttyUSB0'
 
@@ -35,24 +35,50 @@ def overwrite(request):
         if request.data[x].motor == "body":
             if request.data[x].mode == "positon":
                 body_motor_controller.set_operating_mode(XLConfig.OPERATING_MODE_POSITION_CONTROL_MODE)  
-                body_motor_controller.set_goal_position(request.data[x].value)
+                body_motor_controller.set_goal_position(request.data[x].angle)
 
             elif request.data[x].mode == "velocity":
+
+            	intial_position = body_motor_controller.present_position()
                 body_motor_controller.set_operating_mode(XLConfig.OPERATING_MODE_VELOCITY_CONTROL_MODE)  
-                body_motor_controller.set_goal_velocity(request.data[x].value)
+                body_motor_controller.set_goal_velocity(request.data[x].ang_velo)
+
+                if request.data[x].angle > 0:
+                	if intial_position < request.data[x].angle:
+                		flag = -1
+                	else:
+                		flag = 1
+
+                	while flag*(init_position - body_motor_controller.present_position()) > 0:
+                	
+                	body_motor_controller.set_goal_velocity(0.0)		
 
         if request.data[x].motor == "tail":
             if request.data[x].mode == "positon":
                 tail_motor_controller.set_operating_mode(XLConfig.OPERATING_MODE_POSITION_CONTROL_MODE)  
-                tail_motor_controller.set_goal_position(request.data[x].value)
+                tail_motor_controller.set_goal_position(request.data[x].angle)
 
             elif request.data[x].mode == "velocity":
+
+            	intial_position = tail_motor_controller.present_position()
                 tail_motor_controller.set_operating_mode(XLConfig.OPERATING_MODE_VELOCITY_CONTROL_MODE)  
-                tail_motor_controller.set_goal_velocity(request.data[x].value)
+                tail_motor_controller.set_goal_velocity(request.data[x].ang_velo)
+
+                if request.data[x].angle > 0:
+                	if intial_position < request.data[x].angle:
+                		flag = -1
+                	else:
+                		flag = 1
+
+                	while flag*(init_position - tail_motor_controller.present_position()) > 0:
+                	
+                	tail_motor_controller.set_goal_velocity(0.0)
+
+
 def main():
     print "start node."
     rospy.init_node("servomotor_writer")
-    service = rospy.Service('servo_rewrite', WordCount, count_words)
+    service = rospy.Service('servo_rewrite', Dynamixelcontrolarray, overwrite)
 
     timer = rospy.Rate(0.5)
 
@@ -68,8 +94,8 @@ def main():
     tail_motor_controller.current_id = DXL_ID_TAIL
 
 
-    body_motor_controller.set_operating_mode(XLConfig.OPERATING_MODE_POSITION_CONTROL_MODE)
-    tail_motor_controller.set_operating_mode(XLConfig.OPERATING_MODE_VELOCITY_CONTROL_MODE)
+    #body_motor_controller.set_operating_mode(XLConfig.OPERATING_MODE_POSITION_CONTROL_MODE)
+    #tail_motor_controller.set_operating_mode(XLConfig.OPERATING_MODE_VELOCITY_CONTROL_MODE)
 
     #Enabling torque
     print "torque_enable: "
@@ -77,54 +103,14 @@ def main():
     tail_motor_controller.set_torque_enable(1) 
 
 
-    #print "id: " + str(motor_controller.id())
-    #print "baudrate: " + str(motor_controller.baudrate())
-    #print "torque_enable: " + str(motor_controller.torque_enable())
-
-
-
-    # speed = 0.0
-    # dir = 0.2
-    # max_speed = 0.5
-
-
-
-    # sw = False
-
-    # getch = Getch()
-
     while not rospy.is_shutdown():
-        # sw ^= True
 
-        # motor_controller.set_led(int(sw))
-
-        # motor_controller.set_goal_position(0 if sw else 180)
-        # motor_controller.set_goal_position(0.0)
-
-
-        #print "present_position: " + str(motor_controller.present_position())
-
-        # print getch()
-        # continue
-
-        print "cmd << ",
-        cmd = raw_input()
-
-        isAccepted = True
-        if(cmd == "exit"):
-            print "program is now to end..."
-            break
-        else:
-            try:
-                speed = float(cmd)
-                print "speed: " + str(speed)
-                # motor_controller.set_goal_velocity(speed)
-            except:
-                isAccepted = False
-
-
-        if not isAccepted:
-            print "[Error] command parse error!"
+        try:
+            speed = float(cmd)
+            print "speed: " + str(speed)
+            # motor_controller.set_goal_velocity(speed)
+        except:
+            isAccepted = False
 
         print "OK"
 
@@ -146,10 +132,6 @@ def main():
         # print str(speed)
 
         timer.sleep()
-
-    motor_controller.set_led(0)
-    motor_controller.set_goal_velocity(0.0)
-    motor_controller.end()
 
 
 if __name__ == "__main__":
